@@ -61,6 +61,19 @@ class ExchangeManager:
             self.logger.error(f"Exception getting balance: {e}")
             return 0.0
 
+    def has_open_orders(self, symbol):
+        try:
+            response = self.session.get_open_orders(
+                category=self.config['category'],
+                symbol=symbol
+            )
+            if response['retCode'] == 0:
+                return len(response['result']['list']) > 0
+            return False
+        except Exception as e:
+            self.logger.error(f"Exception checking open orders: {e}")
+            return False
+
     def get_position_size(self, symbol):
         try:
             response = self.session.get_positions(

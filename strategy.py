@@ -32,10 +32,24 @@ class Strategy:
 
     def find_levels(self, df, window=20):
         """
-        Finds significant support and resistance levels based on local peaks/troughs.
+        Finds significant support and resistance levels based on local peaks/troughs
+        AND confirmed by trading volume.
         """
         levels = []
+        if len(df) < window * 2:
+            return []
+
+        # Calculate average volume for the window to identify spikes
+        avg_volume = df['volume'].rolling(window=window*2).mean()
+
         for i in range(window, len(df) - window):
+            vol_at_point = df['volume'].iloc[i]
+            current_avg_vol = avg_volume.iloc[i]
+
+            # Only consider levels with significant volume (1.5x average)
+            if vol_at_point < current_avg_vol * 1.5:
+                continue
+
             # Local maximum (Resistance)
             if df['high'].iloc[i] == max(df['high'].iloc[i-window:i+window+1]):
                 levels.append(df['high'].iloc[i])

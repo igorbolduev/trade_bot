@@ -141,6 +141,12 @@ def main():
 
             else:
                 # --- ENTRY SEARCH ---
+                # Check if there are any pending limit orders first
+                if exch.has_open_orders(symbol):
+                    logger.info(f"Open limit orders exist for {symbol}. Waiting for fill...")
+                    time.sleep(config['check_interval'])
+                    continue
+
                 state = {}
                 save_state(state)
 
